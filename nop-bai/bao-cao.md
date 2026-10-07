@@ -18,7 +18,7 @@
 
 **Bộ siêu tham số đã chọn:** `n_estimators=200`, `learning_rate=0.1`, `max_depth=5`.
 
-**Lý do:** Cấu hình thứ ba có F1 lớp dương cao nhất, vượt ngưỡng 0.65. Cấu hình thứ nhất có accuracy cao nhất nhưng F1 thấp hơn, nên chọn theo accuracy sẽ bỏ qua chất lượng nhận diện người thu nhập cao. Cấu hình thứ hai có learning_rate và số cây thấp, F1 chỉ đạt 0.6051. Giảm learning_rate thường cần tăng số cây để bù đóng góp của mỗi cây; tuy nhiên, độ sâu cũng thay đổi nên chưa thể quy riêng tác động cho một tham số. MLflow ghi lại ba thí nghiệm.
+**Lý do:** Cấu hình thứ ba có F1 cao nhất, vượt 0.65. Cấu hình thứ nhất có accuracy cao nhất nhưng F1 thấp hơn, nên chọn theo accuracy sẽ bỏ qua chất lượng nhận diện người thu nhập cao. Cấu hình thứ hai có learning_rate và số cây thấp, F1 chỉ đạt 0.6051. Giảm learning_rate thường cần tăng số cây để bù đóng góp của mỗi cây; tuy nhiên, độ sâu cũng thay đổi nên chưa thể quy riêng tác động cho một tham số. MLflow ghi lại ba thí nghiệm.
 
 ## 2. Vì Sao Ngưỡng Chất Lượng Đặt Trên F1 Chứ Không Phải Accuracy
 
@@ -32,7 +32,7 @@ Tập holdout có 124/500 mẫu thu nhập cao, chiếm 24.8%; lớp thu nhập 
 | MLflow không khởi động được. | Thiếu pkg_resources. | Cài và giữ setuptools dưới phiên bản 81. |
 | Release không restart API được. | VM thiếu income-api.service. | Đưa API, cấu hình Azure và systemd lên VM; chạy lại Release thành công. |
 
-## 4. So Sánh Bước 2 và Bước 3 (bắt buộc, 2 - 3 câu)
+## 4. So Sánh Bước 2 và Bước 3
 
 | | f1_score | accuracy |
 |---|---|---|
@@ -40,3 +40,7 @@ Tập holdout có 124/500 mẫu thu nhập cao, chiếm 24.8%; lớp thu nhập 
 | Bước 3 (44.722 mẫu) | 0.735426 | 0.882 |
 
 **Nhận xét:** F1 tăng 0.020494 và accuracy tăng 0.008 trên cùng holdout, nhưng thêm dữ liệu không bảo đảm luôn tốt hơn. Commit `319e557` chỉ đổi con trỏ DVC và tự kích hoạt đủ bốn jobs thành công, chứng minh huấn luyện và triển khai lại tự động. Số liệu lấy từ report/log CI của [bước 2](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37635194846) và [bước 3](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37638056986).
+
+## 5. Phần Bonus Đã Thực Hiện
+
+Bonus 1: CI ghi parameters, metrics và model lên DagsHub; run `6596fe89bd794567954c8cd9c39f1df2` thành công.

@@ -26,7 +26,7 @@ nop-bai/
 - [x] Đủ 5 ảnh trong `anh-chup-man-hinh/`, đúng tên file, đúng thứ tự (xem
       [yêu cầu chi tiết](anh-chup-man-hinh/README.md)).
 - [x] `bao-cao.md` đã điền đủ 4 mục bắt buộc và không vượt quá 1 trang A4.
-- [ ] Đã `git push` toàn bộ thư mục `nop-bai/` lên GitHub.
+- [x] Đã `git push` toàn bộ thư mục `nop-bai/` lên GitHub.
 - [ ] Dán URL repo GitHub vào bài nộp trên **https://vlearn.dev**.
 - [ ] Mở lại URL vừa nộp ở chế độ ẩn danh để chắc chắn repo public và người chấm xem được.
 
@@ -80,3 +80,7 @@ sips -Z 1600 nop-bai/anh-chup-man-hinh/01-mlflow-ui.png
 - Ảnh MLflow có ba bộ tham số, F1 và accuracy, đã sắp theo F1; thiếu thanh URL, giữ nguyên theo yêu cầu người học.
 - DVC pointer khớp nội dung cả ba CSV; tập train hiện có 44.722 mẫu, holdout 500 mẫu. API công khai trả health OK và dự đoán hợp lệ sau bước 3.
 - Chưa xác nhận nộp URL trên vlearn.dev hoặc kiểm tra ẩn danh; không đánh dấu các mục này thay người học.
+
+## Bonus 1 — DagsHub
+
+Workflow run [37640663189](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37640663189) ghi thí nghiệm vào DagsHub. API MLflow xác nhận run `6596fe89bd794567954c8cd9c39f1df2` có trạng thái FINISHED, F1 0.7354260089686099, accuracy 0.882 và tag commit `51f02a5`. Artifact store dùng `mlflow-artifacts:` của server. Chụp giao diện DagsHub thấy run, parameters và metrics, lưu `anh-chup-man-hinh/06-dagshub-mlflow.png` để bổ sung bằng chứng bonus.
