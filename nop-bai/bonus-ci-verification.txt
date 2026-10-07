@@ -1,0 +1,11 @@
+CI run: https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37642425221
+Commit: 934bf983487042b6bb53e53ba549f292132c244f
+Unit Test / Train / Quality Gate / Release: success
+Local tests: 23 passed
+2026-10-07T15:20:51.4217617Z DATA DISTRIBUTION OK: positive_ratio=0.247842; reference=0.248; tolerance=0.05
+2026-10-07T15:20:51.4218616Z Threshold sweep: best=0.30; F1=0.753731; default F1=0.735426
+2026-10-07T15:20:51.4219124Z F1: 0.7537 | Accuracy: 0.8680
+2026-10-07T15:21:24.0851749Z ALLOW: candidate F1=0.753731; production F1=0.735426
+2026-10-07T15:21:24.0852560Z Published approved model and report: version=37642425221-1
+2026-10-07T15:21:30.2618738Z out: {"status":"ok"}Health check passed.
+VM verification: loaded model.income_threshold_ == 0.3; service active; public healthz OK and score prediction=1.
