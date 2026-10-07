@@ -22,10 +22,10 @@ nop-bai/
 
 Đánh dấu `[x]` khi hoàn thành từng mục:
 
-- [ ] Repo GitHub ở chế độ **public** và chứa toàn bộ code, cấu hình đã hoàn thiện.
-- [ ] Đủ 5 ảnh trong `anh-chup-man-hinh/`, đúng tên file, đúng thứ tự (xem
+- [x] Repo GitHub ở chế độ **public** và chứa toàn bộ code, cấu hình đã hoàn thiện.
+- [x] Đủ 5 ảnh trong `anh-chup-man-hinh/`, đúng tên file, đúng thứ tự (xem
       [yêu cầu chi tiết](anh-chup-man-hinh/README.md)).
-- [ ] `bao-cao.md` đã điền đủ 3 mục bắt buộc và không vượt quá 1 trang A4.
+- [x] `bao-cao.md` đã điền đủ 4 mục bắt buộc và không vượt quá 1 trang A4.
 - [ ] Đã `git push` toàn bộ thư mục `nop-bai/` lên GitHub.
 - [ ] Dán URL repo GitHub vào bài nộp trên **https://vlearn.dev**.
 - [ ] Mở lại URL vừa nộp ở chế độ ẩn danh để chắc chắn repo public và người chấm xem được.
@@ -71,3 +71,12 @@ Nếu bạn dùng macOS, có thể nén nhanh bằng lệnh sẵn có:
 ```bash
 sips -Z 1600 nop-bai/anh-chup-man-hinh/01-mlflow-ui.png
 ```
+
+## Đối chiếu bằng chứng ngày 07/10/2026
+
+- Bước 2: run [37635194846](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37635194846) thành công sau khi bổ sung systemd và chạy lại Release. `report-buoc-2.json` được giải nén từ artifact người học tải về và đối chiếu log Train.
+- Bước 3: run [37638056986](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37638056986) có event `push`, commit `319e557` chỉ thay `data/train_batch1.csv.dvc`; cả bốn jobs thành công. `report-buoc-3.json` chép nguyên hai giá trị từ report in trong log Train, job `112849899023`.
+- Ảnh Storage dùng hai file `05a-storage-dvc.png` và `05b-storage-model.png` theo quy định trong README ảnh. Đã có đủ hai ảnh Storage; tổng cộng 6 file ảnh cho 5 nhóm bằng chứng.
+- Ảnh MLflow có ba bộ tham số, F1 và accuracy, đã sắp theo F1; thiếu thanh URL, giữ nguyên theo yêu cầu người học.
+- DVC pointer khớp nội dung cả ba CSV; tập train hiện có 44.722 mẫu, holdout 500 mẫu. API công khai trả health OK và dự đoán hợp lệ sau bước 3.
+- Chưa xác nhận nộp URL trên vlearn.dev hoặc kiểm tra ẩn danh; không đánh dấu các mục này thay người học.

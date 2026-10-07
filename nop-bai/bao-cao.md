@@ -1,16 +1,5 @@
 # Báo Cáo Lab Day 21 - CI/CD cho AI Systems
 
-<!--
-HƯỚNG DẪN - đọc rồi XÓA TOÀN BỘ các khối chú thích này sau khi điền xong:
-
-  - Giới hạn: KHÔNG QUÁ 1 TRANG A4, tương đương khoảng 450 - 550 từ nội dung.
-  - Chỉ điền vào các chỗ ___ và các ô trong bảng. Không thêm mục mới.
-  - Viết bằng câu hoàn chỉnh, không gạch đầu dòng cụt lủn.
-  - Kiểm tra độ dài sau khi đã xóa hết chú thích:
-        wc -w nop-bai/bao-cao.md
-    và xem trước bản in bằng cách mở file trên GitHub rồi Ctrl+P / Cmd+P.
--->
-
 | | |
 |---|---|
 | Họ và tên | Lê Hoàng Thiên Phú |
@@ -19,11 +8,7 @@ HƯỚNG DẪN - đọc rồi XÓA TOÀN BỘ các khối chú thích này sau k
 | Repo GitHub | https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems |
 | Ngày nộp | 07/10/2026 |
 
----
-
 ## 1. Bộ Siêu Tham Số Đã Chọn và Lý Do
-
-<!-- Khoảng 120 - 150 từ. Điền kết quả thật từ MLflow UI ở Bước 1, tối thiểu 3 lần chạy. -->
 
 | Lần chạy | n_estimators | learning_rate | max_depth | f1_score | accuracy |
 |---|---|---|---|---|---|
@@ -33,71 +18,25 @@ HƯỚNG DẪN - đọc rồi XÓA TOÀN BỘ các khối chú thích này sau k
 
 **Bộ siêu tham số đã chọn:** `n_estimators=200`, `learning_rate=0.1`, `max_depth=5`.
 
-**Lý do:** Cấu hình thứ ba đạt F1 của lớp dương cao nhất (0.7149), vượt ngưỡng triển khai 0.65. Cấu hình thứ nhất có accuracy cao nhất (0.8780) nhưng F1 thấp hơn, cho thấy accuracy không đủ để chọn mô hình cho dữ liệu mất cân bằng. Cấu hình thứ hai giảm đồng thời learning_rate và số cây nên F1 chỉ đạt 0.6051, không đạt ngưỡng. Khi giảm learning_rate thường cần tăng số cây để bù mức đóng góp của mỗi cây. Tuy nhiên, ba lần chạy thay đổi cả độ sâu, nên chưa thể quy riêng chênh lệch cho learning_rate hay số cây. Mô hình và report cuối cùng được lưu từ cấu hình thứ ba để dùng ở Bước 2.
-
-<!--
-Trả lời trong phần Lý do:
-  - Vì sao bộ này tốt hơn các bộ còn lại (dựa trên f1_score, không phải accuracy)?
-  - Lần chạy có accuracy cao nhất có trùng với lần có f1_score cao nhất không?
-    Nếu không, điều đó nói lên điều gì?
-  - Bạn quan sát thấy đánh đổi nào giữa n_estimators và learning_rate?
--->
-
----
+**Lý do:** Cấu hình thứ ba có F1 lớp dương cao nhất, vượt ngưỡng 0.65. Cấu hình thứ nhất có accuracy cao nhất nhưng F1 thấp hơn, nên chọn theo accuracy sẽ bỏ qua chất lượng nhận diện người thu nhập cao. Cấu hình thứ hai có learning_rate và số cây thấp, F1 chỉ đạt 0.6051. Giảm learning_rate thường cần tăng số cây để bù đóng góp của mỗi cây; tuy nhiên, độ sâu cũng thay đổi nên chưa thể quy riêng tác động cho một tham số. MLflow ghi lại ba thí nghiệm.
 
 ## 2. Vì Sao Ngưỡng Chất Lượng Đặt Trên F1 Chứ Không Phải Accuracy
 
-<!-- Khoảng 120 - 150 từ. -->
-
-___
-
-<!--
-Cần nêu được:
-  - Phân bố lớp của tập dữ liệu (tỷ lệ lớp thu nhập > 50K) và hệ quả của nó.
-  - Accuracy của một mô hình luôn trả lời "thu nhập thấp" là bao nhiêu, vì sao con số
-    đó gây hiểu nhầm.
-  - F1 của lớp dương đo điều gì mà accuracy không đo được.
-  - Vì sao KHÔNG dùng average="weighted" hay average="macro" khi gọi f1_score.
--->
-
----
+Tập holdout có 124/500 mẫu thu nhập cao, chiếm 24.8%; lớp thu nhập thấp chiếm 75.2%. Mô hình luôn đoán thu nhập thấp vẫn đạt accuracy 75.2%, dù bỏ sót mọi trường hợp thu nhập cao và có F1 lớp dương bằng 0. F1 là trung bình điều hòa của precision và recall, phản ánh dự đoán dương sai và bỏ sót. Pipeline dùng `f1_score(y_eval, preds)` với lớp dương là 1 và chặn triển khai khi F1 dưới 0.65. Không dùng weighted vì lớp đa số có thể che chất lượng lớp dương; macro cho hai lớp trọng số bằng nhau nhưng cũng không đo riêng mục tiêu nhận diện thu nhập cao.
 
 ## 3. Khó Khăn Gặp Phải và Cách Giải Quyết
 
-<!-- Nêu 2 - 3 khó khăn thật, mỗi ô một câu ngắn. -->
-
 | Khó khăn | Nguyên nhân | Cách giải quyết |
 |---|---|---|
-| ___ | ___ | ___ |
-| ___ | ___ | ___ |
-| ___ | ___ | ___ |
-
----
+| Không dùng được GCP. | Billing bị chặn. | Chuyển DVC, SDK và credentials sang Azure Blob Storage. |
+| MLflow không khởi động được. | Thiếu pkg_resources. | Cài và giữ setuptools dưới phiên bản 81. |
+| Release không restart API được. | VM thiếu income-api.service. | Đưa API, cấu hình Azure và systemd lên VM; chạy lại Release thành công. |
 
 ## 4. So Sánh Bước 2 và Bước 3 (bắt buộc, 2 - 3 câu)
 
-<!-- Lấy số liệu từ bảng ở mục 3.6 của tasks/buoc-3.md. -->
-
 | | f1_score | accuracy |
 |---|---|---|
-| Bước 2 (chỉ `train_batch1`) | ___ | ___ |
-| Bước 3 (thêm `train_batch2`) | ___ | ___ |
+| Bước 2 (22.361 mẫu) | 0.714932 | 0.874 |
+| Bước 3 (44.722 mẫu) | 0.735426 | 0.882 |
 
-**Nhận xét:** ___
-
-<!--
-Một câu trả lời trung thực kiểu "f1 giảm 0,01 vì dữ liệu mới cùng phân phối, không mang
-thêm thông tin mới" được đánh giá cao hơn kết luận sai rằng thêm dữ liệu luôn tốt hơn.
--->
-
----
-
-## 5. Phần Bonus Đã Thực Hiện (nếu có)
-
-<!-- Xóa cả mục 5 nếu không làm bonus. Mỗi bonus tối đa 1 dòng. -->
-
-- [ ] Bonus 1 - Tracking MLflow từ xa với DagsHub: ___
-- [ ] Bonus 2 - Điều chỉnh ngưỡng quyết định: ___
-- [ ] Bonus 3 - Báo cáo precision / recall tự động: ___
-- [ ] Bonus 4 - Hoàn trả về phiên bản trước: ___
-- [ ] Bonus 5 - Cảnh báo lệch lạc dữ liệu: ___
+**Nhận xét:** F1 tăng 0.020494 và accuracy tăng 0.008 trên cùng holdout, nhưng thêm dữ liệu không bảo đảm luôn tốt hơn. Commit `319e557` chỉ đổi con trỏ DVC và tự kích hoạt đủ bốn jobs thành công, chứng minh huấn luyện và triển khai lại tự động. Số liệu lấy từ report/log CI của [bước 2](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37635194846) và [bước 3](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37638056986).
