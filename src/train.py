@@ -1,5 +1,6 @@
 import json
 import os
+from urllib.parse import urlparse
 
 import joblib
 import mlflow
@@ -19,15 +20,24 @@ def train(params: dict, data_path: str = "data/train_batch1.csv",
     experiment_name = "adult-income"
     experiment = mlflow.get_experiment_by_name(experiment_name)
     if experiment is None:
-        from pathlib import Path
-        artifact_root = Path(os.environ.get("MLFLOW_ARTIFACT_ROOT", "./mlartifacts"))
-        mlflow.create_experiment(experiment_name, artifact_location=artifact_root.resolve().as_uri())
+        if urlparse(mlflow.get_tracking_uri()).scheme in {"http", "https"}:
+            # Remote servers select their own artifact store; never send a CI file URI.
+            mlflow.create_experiment(experiment_name)
+        else:
+            from pathlib import Path
+            artifact_root = Path(os.environ.get("MLFLOW_ARTIFACT_ROOT", "./mlartifacts"))
+            mlflow.create_experiment(experiment_name, artifact_location=artifact_root.resolve().as_uri())
     mlflow.set_experiment(experiment_name)
     df_train = pd.read_csv(data_path)
     df_eval = pd.read_csv(eval_path)
     X_train, y_train = df_train.drop(columns=["target"]), df_train["target"]
     X_eval, y_eval = df_eval.drop(columns=["target"]), df_eval["target"]
     with mlflow.start_run():
+        if os.environ.get("GITHUB_SHA"):
+            mlflow.set_tags({
+                "git_commit": os.environ["GITHUB_SHA"],
+                "github_run_id": os.environ.get("GITHUB_RUN_ID", ""),
+            })
         mlflow.log_params(params)
         model = GradientBoostingClassifier(**params, random_state=42)
         model.fit(X_train, y_train)

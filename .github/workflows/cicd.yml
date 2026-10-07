@@ -44,7 +44,15 @@ jobs:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.STORAGE_CREDENTIALS }}
         run: dvc pull data/train_batch1.csv.dvc data/holdout.csv.dvc
       - name: Train model
-        run: python src/train.py
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+        run: |
+          test -n "$MLFLOW_TRACKING_URI" || { echo 'Missing MLFLOW_TRACKING_URI'; exit 1; }
+          test -n "$MLFLOW_TRACKING_USERNAME" || { echo 'Missing MLFLOW_TRACKING_USERNAME'; exit 1; }
+          test -n "$MLFLOW_TRACKING_PASSWORD" || { echo 'Missing MLFLOW_TRACKING_PASSWORD'; exit 1; }
+          python src/train.py
       - name: Read report
         id: read_report
         run: |

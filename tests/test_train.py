@@ -50,3 +50,23 @@ def test_model_file_created(trained):
     report = json.loads(Path('outputs/report.json').read_text())
     assert f1_score(df['target'], predictions) == report['f1_score']
     assert accuracy_score(df['target'], predictions) == report['accuracy']
+
+
+def test_remote_tracking_uses_server_artifact_store(tmp_path, monkeypatch):
+    from importlib import import_module
+    from unittest.mock import MagicMock
+    module = import_module('src.train')
+    remote = MagicMock()
+    remote.get_experiment_by_name.return_value = None
+    remote.get_tracking_uri.return_value = 'https://dagshub.com/example/repo.mlflow'
+    monkeypatch.setattr(module, 'mlflow', remote)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv('MLFLOW_TRACKING_URI', remote.get_tracking_uri.return_value)
+    monkeypatch.setenv('GITHUB_SHA', 'test-commit')
+    train_path, eval_path = _make_temp_data(tmp_path)
+    result = module.train({'n_estimators': 10, 'learning_rate': 0.1, 'max_depth': 2},
+                          data_path=train_path, eval_path=eval_path)
+    assert 0 <= result <= 1
+    remote.create_experiment.assert_called_once_with('adult-income')
+    remote.sklearn.log_model.assert_called_once()
+    assert remote.set_tags.call_args.args[0]['git_commit'] == 'test-commit'
