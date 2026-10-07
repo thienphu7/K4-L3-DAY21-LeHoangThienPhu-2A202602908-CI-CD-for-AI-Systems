@@ -1,84 +1,57 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from google.cloud import storage
-import joblib
+from contextlib import asynccontextmanager
+from pathlib import Path
 import os
+import joblib
+import pandas as pd
+from azure.storage.blob import BlobServiceClient
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, ConfigDict
 
-app = FastAPI()
-
-ARTIFACT_BUCKET = os.environ["ARTIFACT_BUCKET"]
-MODEL_KEY = "artifacts/current/model.joblib"
-MODEL_PATH = os.path.expanduser("~/models/model.joblib")
+FEATURE_NAMES = ['age', 'workclass', 'education_num', 'marital_status', 'occupation',
+                 'relationship', 'sex', 'capital_gain', 'capital_loss', 'hours_per_week']
+MODEL_KEY = 'artifacts/current/model.joblib'
 
 
 def download_model():
-    """
-    Tai file model.joblib tu cloud storage ve may khi server khoi dong.
-
-    Ham nay duoc goi mot lan khi module duoc import. Su dung
-    GOOGLE_APPLICATION_CREDENTIALS de xac thuc (duoc dat trong systemd service).
-    """
-    # TODO 1: Tao storage.Client()
-    # client = storage.Client()
-
-    # TODO 2: Lay bucket va blob tuong ung
-    # bucket = client.bucket(ARTIFACT_BUCKET)
-    # blob   = bucket.blob(MODEL_KEY)
-
-    # TODO 3: Tai file model xuong may
-    # blob.download_to_filename(MODEL_PATH)
-
-    # TODO 4: In thong bao thanh cong
-    # print("Model da duoc tai xuong tu cloud storage.")
-
-    pass  # xoa dong nay sau khi hoan thanh tat ca TODO ben tren
+    path = Path(os.environ.get('MODEL_PATH', '~/models/model.joblib')).expanduser()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix('.download')
+    with BlobServiceClient.from_connection_string(os.environ['AZURE_STORAGE_CONNECTION_STRING']) as client:
+        blob = client.get_blob_client(os.environ['ARTIFACT_BUCKET'], MODEL_KEY)
+        with temporary.open('wb') as stream:
+            blob.download_blob().readinto(stream)
+    temporary.replace(path)
+    print('Model downloaded from Azure Blob Storage.', flush=True)
+    return path
 
 
-download_model()
-model = joblib.load(MODEL_PATH)
+@asynccontextmanager
+async def lifespan(app):
+    app.state.model = joblib.load(download_model())
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 class ScoreRequest(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
     features: list[float]
 
 
-@app.get("/healthz")
+@app.get('/healthz')
 def healthz():
-    """
-    Endpoint kiem tra suc khoe server.
-    GitHub Actions goi endpoint nay sau khi deploy de xac nhan server dang chay.
-
-    Tra ve: {"status": "ok"}
-    """
-    # TODO 5: Tra ve dict {"status": "ok"}
-    pass  # xoa dong nay sau khi hoan thanh
+    return {'status': 'ok'}
 
 
-@app.post("/score")
+@app.post('/score')
 def score(req: ScoreRequest):
-    """
-    Endpoint suy luan chinh.
-
-    Dau vao : JSON {"features": [f1, f2, ..., f10]}
-    Dau ra  : JSON {"prediction": <0|1>, "label": <"thu_nhap_thap"|"thu_nhap_cao">}
-
-    Thu tu 10 dac trung (khop voi thu tu trong FEATURE_NAMES cua test):
-        age, workclass, education_num, marital_status, occupation,
-        relationship, sex, capital_gain, capital_loss, hours_per_week
-    """
-    # TODO 6: Kiem tra so luong dac trung.
-    # Neu len(req.features) != 10, raise HTTPException(status_code=400, ...)
-
-    # TODO 7: Goi model.predict([req.features]) de lay ket qua du doan.
-    # pred = model.predict(...)
-
-    # TODO 8: Tra ve dict chua "prediction" (int) va "label" (string).
-    # Nhan tuong ung: 0 -> "thu_nhap_thap", 1 -> "thu_nhap_cao"
-    # return {"prediction": ..., "label": ...}
-
-    pass  # xoa dong nay sau khi hoan thanh tat ca TODO ben tren
+    if len(req.features) != 10:
+        raise HTTPException(status_code=400, detail='Expected 10 features (adult income)')
+    prediction = int(app.state.model.predict(pd.DataFrame([req.features], columns=FEATURE_NAMES))[0])
+    return {'prediction': prediction, 'label': 'thu_nhap_cao' if prediction == 1 else 'thu_nhap_thap'}
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host='0.0.0.0', port=8080)

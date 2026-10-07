@@ -13,11 +13,11 @@ HƯỚNG DẪN - đọc rồi XÓA TOÀN BỘ các khối chú thích này sau k
 
 | | |
 |---|---|
-| Họ và tên | ___ |
-| MSSV | ___ |
-| Lớp / Khóa | K4 |
-| Repo GitHub | https://github.com/___/___ |
-| Ngày nộp | ___ |
+| Họ và tên | Lê Hoàng Thiên Phú |
+| MSSV | 2A202602908 |
+| Lớp / Khóa | K4-L3A |
+| Repo GitHub | https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems |
+| Ngày nộp | 07/10/2026 |
 
 ---
 
@@ -27,13 +27,13 @@ HƯỚNG DẪN - đọc rồi XÓA TOÀN BỘ các khối chú thích này sau k
 
 | Lần chạy | n_estimators | learning_rate | max_depth | f1_score | accuracy |
 |---|---|---|---|---|---|
-| 1 | ___ | ___ | ___ | ___ | ___ |
-| 2 | ___ | ___ | ___ | ___ | ___ |
-| 3 | ___ | ___ | ___ | ___ | ___ |
+| 1 | 100 | 0.1 | 3 | 0.7109 | 0.8780 |
+| 2 | 50 | 0.05 | 2 | 0.6051 | 0.8460 |
+| 3 | 200 | 0.1 | 5 | 0.7149 | 0.8740 |
 
-**Bộ siêu tham số đã chọn:** `n_estimators=___`, `learning_rate=___`, `max_depth=___`.
+**Bộ siêu tham số đã chọn:** `n_estimators=200`, `learning_rate=0.1`, `max_depth=5`.
 
-**Lý do:** ___
+**Lý do:** Cấu hình thứ ba đạt F1 của lớp dương cao nhất (0.7149), vượt ngưỡng triển khai 0.65. Cấu hình thứ nhất có accuracy cao nhất (0.8780) nhưng F1 thấp hơn, cho thấy accuracy không đủ để chọn mô hình cho dữ liệu mất cân bằng. Cấu hình thứ hai giảm đồng thời learning_rate và số cây nên F1 chỉ đạt 0.6051, không đạt ngưỡng. Khi giảm learning_rate thường cần tăng số cây để bù mức đóng góp của mỗi cây. Tuy nhiên, ba lần chạy thay đổi cả độ sâu, nên chưa thể quy riêng chênh lệch cho learning_rate hay số cây. Mô hình và report cuối cùng được lưu từ cấu hình thứ ba để dùng ở Bước 2.
 
 <!--
 Trả lời trong phần Lý do:

@@ -1,0 +1,4 @@
+# Dataset contents are versioned by DVC; commit the .dvc pointers instead.
+/train_batch1.csv
+/holdout.csv
+/train_batch2.csv
