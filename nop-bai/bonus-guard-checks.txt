@@ -1,0 +1,7 @@
+Bonus 4: real Azure regression guard test with a deliberately lower candidate; no deployment requested.
+BLOCK REGRESSION: candidate F1=0.725426; production F1=0.735426
+PASS: production model ETag unchanged; lower-F1 candidate rejected before upload.
+
+Bonus 5: deliberately synthetic class distribution for warning-branch verification.
+WARNING: DATA DRIFT: positive_ratio=0.500000; reference=0.248; tolerance=0.05
+PASS: synthetic 50% positive rate triggers warning against 24.8% reference.

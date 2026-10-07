@@ -84,3 +84,13 @@ sips -Z 1600 nop-bai/anh-chup-man-hinh/01-mlflow-ui.png
 ## Bonus 1 — DagsHub
 
 Workflow run [37640663189](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37640663189) ghi thí nghiệm vào DagsHub. API MLflow xác nhận run `6596fe89bd794567954c8cd9c39f1df2` có trạng thái FINISHED, F1 0.7354260089686099, accuracy 0.882 và tag commit `51f02a5`. Artifact store dùng `mlflow-artifacts:` của server. Chụp giao diện DagsHub thấy run, parameters và metrics, lưu `anh-chup-man-hinh/06-dagshub-mlflow.png` để bổ sung bằng chứng bonus.
+
+## Bonus 2–5 — Cách kiểm chứng
+
+- `src/train.py`: quét 17 ngưỡng từ 0.10 đến 0.90, log ngưỡng/F1 mặc định/tỷ lệ dương lên MLflow và lưu report. Thuộc tính `income_threshold_` đi cùng file model để API dùng đúng ngưỡng. F1 đã tối ưu trên holdout không phải đánh giá độc lập.
+- `src/detail.py`: workflow chạy sau Train để tạo `outputs/detail.txt`, gồm confusion matrix và precision/recall từng lớp; artifact `report` chứa cả JSON và TXT.
+- `src/release.py`: so F1 với `artifacts/current/report.json`, chỉ publish nếu không giảm; báo lỗi khi baseline không hợp lệ hoặc hash model/report không khớp. Report/model được lưu cả dưới `artifacts/versions/<run-id>-<attempt>/`. Khi candidate bị chặn, bước copy API và restart được skip.
+- Tỷ lệ dương tham chiếu 0.248, cảnh báo nếu chênh lệch lớn hơn 0.05; dữ liệu lệch chỉ cảnh báo, không làm pipeline thất bại.
+- `bonus-guard-checks.txt` ghi thử nghiệm guard trực tiếp với Azure: candidate thấp hơn bị chặn, ETag model không đổi; cảnh báo phân phối được thử bằng dữ liệu giả 50%, không thay dữ liệu thật.
+- `report-bonus.json` và `detail-bonus.txt`: kết quả chạy cục bộ trên train 44.722 mẫu; đối chiếu lại với CI run [37642425221](https://github.com/thienphu7/K4-L3-DAY21-LeHoangThienPhu-2A202602908-CI-CD-for-AI-Systems/actions/runs/37642425221) khi runner hoàn tất.
+- Kiểm thử cục bộ: 23 tests đạt, gồm API dùng threshold, metrics model đã serialize, per-class report, cả hai nhánh drift và regression guard.

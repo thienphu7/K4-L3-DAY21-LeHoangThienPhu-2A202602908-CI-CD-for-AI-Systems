@@ -1,0 +1,14 @@
+Decision threshold: 0.3
+Threshold was selected on this holdout; metrics are not an independent test estimate.
+Confusion matrix: rows=true, columns=predicted; class order=[0, 1]
+[[333  43]
+ [ 23 101]]
+
+               precision    recall  f1-score   support
+
+thu_nhap_thap   0.935393  0.885638  0.909836       376
+ thu_nhap_cao   0.701389  0.814516  0.753731       124
+
+     accuracy                       0.868000       500
+    macro avg   0.818391  0.850077  0.831784       500
+ weighted avg   0.877360  0.868000  0.871122       500
