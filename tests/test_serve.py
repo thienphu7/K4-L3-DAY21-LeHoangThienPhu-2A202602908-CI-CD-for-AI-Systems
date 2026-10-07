@@ -55,3 +55,17 @@ def test_download_model(tmp_path, monkeypatch):
     assert path.read_bytes() == b'model bytes'
     client.get_blob_client.assert_called_once_with('test-container', serve.MODEL_KEY)
     assert not path.with_suffix('.download').exists()
+
+
+def test_score_uses_saved_threshold(client):
+    model = MagicMock()
+    model.income_threshold_ = 0.3
+    model.predict_proba.return_value = np.array([[0.6, 0.4]])
+    monkey_model = serve.app.state.model
+    try:
+        serve.app.state.model = model
+        response = client.post('/score', json={'features': [0] * 10})
+        assert response.json()['prediction'] == 1
+        model.predict.assert_not_called()
+    finally:
+        serve.app.state.model = monkey_model

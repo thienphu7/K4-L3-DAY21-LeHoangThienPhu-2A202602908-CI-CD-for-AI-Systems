@@ -46,7 +46,7 @@ def test_report_file_created(trained):
 def test_model_file_created(trained):
     model = joblib.load('models/model.joblib')
     df = pd.read_csv(trained[1])
-    predictions = model.predict(df[FEATURE_NAMES])
+    predictions = (model.predict_proba(df[FEATURE_NAMES])[:, 1] >= model.income_threshold_).astype(int)
     report = json.loads(Path('outputs/report.json').read_text())
     assert f1_score(df['target'], predictions) == report['f1_score']
     assert accuracy_score(df['target'], predictions) == report['accuracy']
@@ -70,3 +70,12 @@ def test_remote_tracking_uses_server_artifact_store(tmp_path, monkeypatch):
     remote.create_experiment.assert_called_once_with('adult-income')
     remote.sklearn.log_model.assert_called_once()
     assert remote.set_tags.call_args.args[0]['git_commit'] == 'test-commit'
+
+
+def test_detail_report(trained):
+    from src.detail import create_detail
+    text = create_detail(data_path=trained[1])
+    assert 'Confusion matrix' in text
+    assert 'precision' in text and 'recall' in text
+    assert 'thu_nhap_thap' in text and 'thu_nhap_cao' in text
+    assert Path('outputs/detail.txt').read_text(encoding='utf-8') == text

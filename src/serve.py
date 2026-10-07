@@ -48,7 +48,13 @@ def healthz():
 def score(req: ScoreRequest):
     if len(req.features) != 10:
         raise HTTPException(status_code=400, detail='Expected 10 features (adult income)')
-    prediction = int(app.state.model.predict(pd.DataFrame([req.features], columns=FEATURE_NAMES))[0])
+    model = app.state.model
+    features = pd.DataFrame([req.features], columns=FEATURE_NAMES)
+    threshold = getattr(model, 'income_threshold_', None)
+    if threshold is None:
+        prediction = int(model.predict(features)[0])
+    else:
+        prediction = int(model.predict_proba(features)[0, 1] >= threshold)
     return {'prediction': prediction, 'label': 'thu_nhap_cao' if prediction == 1 else 'thu_nhap_thap'}
 
 
